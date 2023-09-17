@@ -28,6 +28,7 @@ app.use('/api/users', usersRouter);
 // app.use("/api/user", usersRouter);
 // Custom routes
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/news", require("./routes/news"));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

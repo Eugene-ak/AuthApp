@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { v4:uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const tokenModel = require("../models/token.model");
-const { genTokens, genRefreshToken, hashToken, sendMail } = require("../utils/auth.utils");
+const { genTokens, genRefreshToken, hashToken, sendMail, genAccessToken } = require("../utils/auth.utils");
 
 const register = async (req, res) => {
     try {
@@ -28,7 +28,8 @@ const register = async (req, res) => {
         const refreshToken = genRefreshToken(foundUser, jti);
         const tokenData = {
             userId: foundUser._id,
-            token: hashToken(refreshToken)
+            token: hashToken(refreshToken),
+            jti: jti
         }
         const token = new tokenModel(tokenData);
         await token.save();
@@ -57,7 +58,8 @@ const login = async (req, res) => {
         console.log(foundUser);
         const tokenData = {
             userId: foundUser._id,
-            token: hashToken(refreshToken)
+            token: hashToken(refreshToken),
+            jti: jti
         }
         const token = new tokenModel(tokenData);
         await token.save();
@@ -126,9 +128,53 @@ const resetPassword = async (req, res) => {
     }
 }
 
+const genAccessFromRefresh = async (req, res) => {
+    try {
+        const { refreshToken } =req.body;
+        if (!refreshToken) {
+            return res.status(404).json({error: "Missing refresh token"});
+        }
+        const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET_KEY);
+        const jti = payload.jti;
+        const savedToken = await tokenModel.findOne({jti});
+        
+        if (!savedToken || savedToken.revoked == true) {
+            return res.status(401).json({error: "Invalid token"});
+        }
+        const hashedToken = hashToken(refreshToken);
+        
+        if (hashedToken !== savedToken.token) {
+            return res.status(401).json({error: "Unauthorised"});
+        }
+        const { userId } = savedToken;
+        const foundUser = await userModel.findById(userId);
+        if (!foundUser) {
+            return res.status(404).json({error: "User does not exist"});
+        }
+        
+        const accessToken = genAccessToken(foundUser);
+        await savedToken.updateOne({revoked: true});
+        res.json({accessToken});
+    } catch (error) {
+        return res.status(401).json({error: error.message});
+    }
+}
+
+const revokeToken = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        await tokenModel.updateMany({userId}, {revoked: true});
+        res.json({message: "Token revoked successfully"});
+    } catch (error) {
+        return res.status(401).json({error: error.message});
+    }
+}
+
 module.exports = {
     register,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    genAccessFromRefresh,
+    revokeToken
 }
