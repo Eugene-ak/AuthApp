@@ -82,7 +82,6 @@ const changePassword = async (req, res) => {
 const deleteLoggedInUser = async (req, res) => {
     try {
         const { id } = req.payload;
-        // const user = await userModel.deleteOne(id);
         const user = await userModel.findOneAndUpdate(id, {$set: {isDeleted: true}});
         res.status(204).json({message: "Successfully deleted"});
     } catch (error) {

@@ -8,7 +8,7 @@ const isAuthenticated = (req, res, next) => {
         }
         const token = authorization.split(" ")[1];
         const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
-        console.log(payload);
+        // console.log(payload);
         req.payload = payload;
         // console.log(req.headers);
         return next();
@@ -20,8 +20,8 @@ const isAuthenticated = (req, res, next) => {
 const isAdmin = (req, res, next) => {
     try {
         const { userRole } = req.payload;
-        console.log(req.payload);
-        console.log(userRole);
+        // console.log(req.payload);
+        // console.log(userRole);
         if ( userRole !== "admin") {
             return res.status(403).json("Access denied");
         }
