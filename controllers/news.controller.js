@@ -31,8 +31,28 @@ const uploadNews = async (req, res) => {
 
 const getAllNews = async (req, res) => {
     try {
-        const news = await newsModel.find();
-        res.json(news);
+        let { pageNumber = 1, limit = 10 } = req.query;
+        const news = await newsModel.find().skip((pageNumber - 1) * limit).limit(limit);
+        const totalCount = await newsModel.countDocuments();
+        let totalPages = totalCount == 0 ? 1 : Math.ceil(totalCount / limit);
+
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+
+        if (pageNumber > totalPages) {
+
+            return res.status(404).json({error: "Page not found"});
+
+        } else {
+            const nextPage = (pageNumber + 1) > totalPages ? totalPages : pageNumber + 1;
+            const prevPage = (pageNumber - 1) <= 0 ? pageNumber : pageNumber - 1;
+
+            const startIndex = pageNumber == 1 || limit == 1 ? pageNumber : (pageNumber * limit) - 1;
+            const endIndex = pageNumber == 1 ? news.length : pageNumber == totalPages ? ((pageNumber - 1) * limit) + news.length : ((pageNumber - 1) * limit) + limit;
+            
+            res.json({news, totalCount, totalPages, currentPage: parseInt(pageNumber), nextPage, prevPage, startIndex, endIndex});
+        }
+
     } catch (error) {
         return res.status(400).json({error: error.message});
     }

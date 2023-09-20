@@ -6,9 +6,30 @@ const bcrypt = require("bcrypt");
 
 const getAllUsers = async (req, res) => {
     try{
-        // console.log(req.headers);
-        const users = await userModel.find();
-        res.json(users);
+        let { pageNumber = 1, limit = 10 } = req.query;
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+
+        const users = await userModel.find().skip((pageNumber - 1)).limit(limit);
+        const totalCount = await userModel.countDocuments();
+        let totalPages = totalCount == 0 ? 1 : Math.ceil(totalCount / limit);
+
+        if (pageNumber > totalPages) {
+
+            return res.status(404).json({error: "Page not found"});
+
+        } else {
+
+            const nextPage = (pageNumber + 1) > totalPages ? false : pageNumber + 1;
+            const prevPage = (pageNumber - 1) <= 0 ? false : pageNumber - 1;
+
+            const startIndex = pageNumber == 1 || limit == 1 ? pageNumber : (pageNumber * limit) - 1;
+            const endIndex = pageNumber == 1 ? users.length : pageNumber == totalPages ? ((pageNumber - 1) * limit) + users.length : ((pageNumber - 1) * limit) + limit;
+
+            res.json({users, totalCount, totalPages, currentPage: pageNumber, prevPage, nextPage, startIndex, endIndex});
+
+        }
+
     } catch (error) {
         return res.status(400).json({error: error.message});
     }
