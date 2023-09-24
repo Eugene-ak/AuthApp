@@ -3,15 +3,27 @@ const userModel = require("../models/user.model");
 const { uploadFile } = require("../utils/fileUpload.utils");
 const { updateUserValidation } = require("../validations/user.validation");
 const bcrypt = require("bcrypt");
+const { paginateArray } = require("../utils/paginate.utils");
 
 const getAllUsers = async (req, res) => {
     try{
-        let { pageNumber = 1, limit = 10 } = req.query;
+        let { pageNumber = 1, limit = 10, deleted } = req.query;
         pageNumber = parseInt(pageNumber);
         limit = parseInt(limit);
+        let users;
+        let totalCount;
+        if (deleted) {
 
-        const users = await userModel.find().skip((pageNumber - 1)).limit(limit);
-        const totalCount = await userModel.countDocuments();
+            users = await userModel.find({isDeleted: deleted}).skip((pageNumber - 1) * limit).limit(limit);
+            totalCount = await userModel.countDocuments({isDeleted: deleted});
+            
+        } else {
+
+            users = await userModel.find().skip((pageNumber - 1) * limit).limit(limit);
+            totalCount = await userModel.countDocuments();
+
+        }
+
         let totalPages = totalCount == 0 ? 1 : Math.ceil(totalCount / limit);
 
         if (pageNumber > totalPages) {
@@ -27,6 +39,59 @@ const getAllUsers = async (req, res) => {
             const endIndex = pageNumber == 1 ? users.length : pageNumber == totalPages ? ((pageNumber - 1) * limit) + users.length : ((pageNumber - 1) * limit) + limit;
 
             res.json({users, totalCount, totalPages, currentPage: pageNumber, prevPage, nextPage, startIndex, endIndex});
+
+        }
+
+    } catch (error) {
+        return res.status(400).json({error: error.message});
+    }
+}
+
+const getAllUsersManualPagination = async (req, res) => {
+    try{
+        let { pageNumber = 1, limit = 10, deleted, search } = req.query;
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+        let users;
+        let totalCount;
+
+        users = await userModel.find();
+        totalCount = await userModel.countDocuments();
+
+        if (deleted) {
+
+            users = await userModel.find({isDeleted: deleted});
+            totalCount = await userModel.countDocuments({isDeleted: deleted});
+            
+        }
+
+        if (search) {
+            users = users.filter((item) => {
+                const fullName = `${item?.firstName} ${item?.lastName}`;
+                return fullName?.toLowerCase()?.includes(search.trim().toLowerCase()) || 
+                item?.email.toLowerCase()?.includes(search.toLowerCase());
+            })
+
+            totalCount = users.length;
+        }
+
+        const paginatedItems = paginateArray(users, pageNumber, limit);
+
+        let totalPages = totalCount == 0 ? 1 : Math.ceil(totalCount / limit);
+
+        if (pageNumber > totalPages) {
+
+            return res.status(404).json({error: "Page not found"});
+
+        } else {
+
+            const nextPage = (pageNumber + 1) > totalPages ? false : pageNumber + 1;
+            const prevPage = (pageNumber - 1) <= 0 ? false : pageNumber - 1;
+
+            const startIndex = pageNumber == 1 || limit == 1 ? pageNumber : (pageNumber * limit) - 1;
+            const endIndex = pageNumber == 1 ? users.length : pageNumber == totalPages ? ((pageNumber - 1) * limit) + users.length : ((pageNumber - 1) * limit) + limit;
+
+            res.json({users: paginatedItems, totalCount, totalPages, currentPage: pageNumber, prevPage, nextPage, startIndex, endIndex});
 
         }
 
@@ -141,5 +206,6 @@ module.exports = {
     updateLoggedInUser,
     deleteLoggedInUser,
     changePassword,
-    uploadProfileImage
+    uploadProfileImage,
+    getAllUsersManualPagination
 }

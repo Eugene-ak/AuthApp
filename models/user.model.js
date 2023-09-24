@@ -19,6 +19,15 @@ const userSchema = new mongoose.Schema(
         dateOfBirth: {
             type: String
         },
+        totalDues: {
+            type: Number
+        },
+        balance: {
+            type: Number
+        },
+        totalAmountPaid: {
+            type: Number
+        },
         isDeleted: {
             type: Boolean,
             default: false
