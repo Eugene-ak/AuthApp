@@ -6,6 +6,7 @@ var logger = require('morgan');
 const mongoose = require("mongoose");
 require("dotenv").config();
 const cors = require("cors");
+const expressListRoutes = require('express-list-routes');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -24,11 +25,12 @@ app.use("/public", express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use('/', indexRouter);
-app.use('/api/users', usersRouter);
+app.use('/users', usersRouter);
 // app.use("/api/user", usersRouter);
 // Custom routes
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/news", require("./routes/news"));
+app.use("/auth", require("./routes/auth"));
+app.use("/news", require("./routes/news"));
+app.use("/momo/auth", require("./routes/momo"));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -59,5 +61,7 @@ try {
 } catch (error) {
   
 }
+
+expressListRoutes(app, { prefix: '/api' });
 
 module.exports = app;

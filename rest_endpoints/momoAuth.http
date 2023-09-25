@@ -1,0 +1,14 @@
+### Get unique reference
+GET http://localhost:3000/momo/auth/getReferenceId
+
+### Create API user
+POST http://localhost:3000/momo/auth/createApiUser
+
+### Confirm API user
+GET http://localhost:3000/momo/auth/confirmApiUser
+
+### Get API key
+POST http://localhost:3000/momo/auth/getApiKey
+
+### Get access token
+POST http://localhost:3000/momo/auth/getAccessToken
