@@ -1,0 +1,5 @@
+### Get account balance
+GET http://localhost:3000/momo/accountBalance
+
+### Get user info
+GET http://localhost:3000/momo/getUserInfo

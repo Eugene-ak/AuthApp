@@ -30,7 +30,9 @@ app.use('/users', usersRouter);
 // Custom routes
 app.use("/auth", require("./routes/auth"));
 app.use("/news", require("./routes/news"));
-app.use("/momo/auth", require("./routes/momo"));
+app.use("/momoAuth", require("./routes/momoAuth"));
+app.use("/momo", require("./routes/momo"));
+expressListRoutes(app, { prefix: '/api' });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -62,6 +64,5 @@ try {
   
 }
 
-expressListRoutes(app, { prefix: '/api' });
 
 module.exports = app;

@@ -69,7 +69,7 @@ const getAPIKey = async () => {
         }
         const result = await axios(options);
         // console.log(result);
-        process.env.MOMO_API_KEY = result.data.apiKey;
+        // process.env.MOMO_API_KEY = result.data.apiKey;
         return result.data;
     } catch (error) {
         return error.message;
