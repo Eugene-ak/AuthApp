@@ -1,0 +1,44 @@
+### Register new user
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "firstName": "Eugene",
+    "lastName": "Stark",
+    "email": "sssciyamax160@recutv.com",
+    "password": "123456789"
+}
+
+### Login user
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "sssciyamax160@recutv.com",
+    "password": "123456789"
+}
+
+### Forgot password
+PATCH http://localhost:3000/auth/forgotPassword
+Content-Type: application/json
+
+{
+    "email": "ciyamax160@recutv.com"
+}
+
+### Reset password
+PATCH http://localhost:3000/auth/resetPassword
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA0NmQxYjJmMmQ1NzdmMjBlMGM3NmMiLCJ1c2VyRW1haWwiOiJjaXlhbWF4MTYwQHJlY3V0di5jb20iLCJ1c2VyUm9sZSI6InVzZXIiLCJmaXJzdE5hbWUiOiJFdWdlbmUiLCJqdGkiOiI3ZWZkYzE5Zi05ZjdlLTQ1YmQtYjRjYi0wNzUwYTcxOThlM2UiLCJpYXQiOjE2OTQ3ODkyMjksImV4cCI6MTY5NDgxMDgyOX0.R0Peraa8rGtDirvLyfh4p3dzwfCwxLcyBujbzPFfy7E",
+    "password": "987654321"
+}
+
+### Get access token from refresh token
+PATCH http://localhost:3000/api/auth/genAccessFromRefresh
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE0NDNmOWNjMDg5M2QzYTBkNGNlOTMiLCJ1c2VyRW1haWwiOiJzc3NjaXlhbWF4MTYwQHJlY3V0di5jb20iLCJ1c2VyUm9sZSI6InVzZXIiLCJmaXJzdE5hbWUiOiJFdWdlbmUiLCJqdGkiOiJmNmE1ZTJkMi0wOTFmLTRmNGYtYTBlYi1lNmJiOWVjMmVmYWEiLCJpYXQiOjE2OTU4Mjk5ODYsImV4cCI6MTY5NTg1MTU4Nn0.S9N7dihO4HOQ2CYbdNc-bgFg1_hC57qNYNRBrVO6k9E"
+}

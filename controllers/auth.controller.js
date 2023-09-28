@@ -55,7 +55,7 @@ const login = async (req, res) => {
 
         const jti = uuidv4();
         const { accessToken, refreshToken} = genTokens(foundUser, jti);
-        console.log(foundUser);
+        // console.log(foundUser);
         const tokenData = {
             userId: foundUser._id,
             token: hashToken(refreshToken),
@@ -110,7 +110,7 @@ const resetPassword = async (req, res) => {
         }
         const hashedToken = hashToken(token);
         // console.log(hashedToken);
-        console.log(savedToken.token);
+        // console.log(savedToken.token);
         if (hashedToken !== savedToken.token) {
             return res.status(401).json({error: "Unauthorised"});
         }
@@ -130,7 +130,7 @@ const resetPassword = async (req, res) => {
 
 const genAccessFromRefresh = async (req, res) => {
     try {
-        const { refreshToken } =req.body;
+        const { refreshToken } = req.body;
         if (!refreshToken) {
             return res.status(404).json({error: "Missing refresh token"});
         }

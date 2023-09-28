@@ -28,11 +28,11 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 // app.use("/api/user", usersRouter);
 // Custom routes
-app.use("/auth", require("./routes/auth"));
-app.use("/news", require("./routes/news"));
-app.use("/momoAuth", require("./routes/momoAuth"));
-app.use("/momo", require("./routes/momo"));
-expressListRoutes(app, { prefix: '/api' });
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/news", require("./routes/news"));
+app.use("/api/momoAuth", require("./routes/momoAuth"));
+app.use("/api/momo", require("./routes/momo"));
+expressListRoutes(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
